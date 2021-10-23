@@ -26,7 +26,7 @@ install: ## install dev tools
 
 .PHONY: build
 build: ## build executable binary
-	go build -o bin/bump
+	go build -o bin/bump ./cmd/bump
 
 .PHONY: lint
 lint: fmt vet staticcheck ## lint all
