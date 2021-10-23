@@ -20,6 +20,10 @@ MAKEFLAGS += --no-builtin-variables
 #
 # Go
 #
+.PHONY: install
+install: ## install dev tools
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+
 .PHONY: build
 build: ## build executable binary
 	go build -o bin/bump
