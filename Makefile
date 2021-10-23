@@ -28,6 +28,10 @@ install: ## install dev tools
 build: ## build executable binary
 	go build -o bin/bump
 
+.PHONY: staticcheck
+staticcheck: ## static analysis by staticcheck
+	staticcheck ./...
+
 .PHONY: vet
 vet: ## static analysis by vet
 	go vet ./...
