@@ -22,6 +22,7 @@ MAKEFLAGS += --no-builtin-variables
 #
 .PHONY: install
 install: ## install dev tools
+	go install golang.org/x/tools/cmd/goimports@latest
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 
 .PHONY: build
