@@ -25,11 +25,11 @@ build: ## build executable binary
 	go build -o bin/bump
 
 .PHONY: vet
-vet:
+vet: ## static analysis by vet
 	go vet ./...
 
 .PHONY: fmt
-fmt:
+fmt: ## format code
 	go fmt ./...
 
 #
