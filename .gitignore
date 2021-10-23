@@ -1,3 +1,6 @@
+# Output of the executable binaries
+bin/
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
