@@ -40,6 +40,10 @@ staticcheck: ## static analysis by staticcheck
 vet: ## static analysis by vet
 	go vet ./...
 
+.PHONY: goimports
+goimports: ## update import lines
+	goimports -w .
+
 .PHONY: fmt
 fmt: ## format code
 	go fmt ./...
