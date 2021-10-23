@@ -24,6 +24,10 @@ MAKEFLAGS += --no-builtin-variables
 build: ## build executable binary
 	go build -o bin/bump
 
+.PHONY: vet
+vet:
+	go vet ./...
+
 .PHONY: fmt
 fmt:
 	go fmt ./...
