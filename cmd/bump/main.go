@@ -42,9 +42,6 @@ func handle() error {
 	case "show":
 		cmd := &bump.ShowCommand{}
 		return cmd.Run(VersionFile)
-	case "up":
-		cmd := &bump.UpCommand{}
-		return cmd.Run(VersionFile, bump.MINOR)
 	}
 	return nil
 }
