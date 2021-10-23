@@ -69,6 +69,42 @@ func (c *UpCommand) Run(filename string, versionType VersionType) error {
 	return nil
 }
 
+// VersionFile wraps the I/O method for the version file.
+type VersionFile struct {
+	path string
+}
+
+// NewVersionFile constructs a new VersionFile.
+func NewVersionFile(path string) *VersionFile {
+	return &VersionFile{
+		path: path,
+	}
+}
+
+// Read reads the version file and returns the current version.
+func (f *VersionFile) Read() (string, error) {
+	bytes, err := os.ReadFile(f.path)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
+}
+
+// Write writes the version to the version file.
+func (f *VersionFile) Write(version string) error {
+	file, err := os.Create(f.path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(strings.TrimSpace(version) + "\n")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 type VersionType int
 
 const (
