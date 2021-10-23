@@ -18,6 +18,13 @@ MAKEFLAGS += --no-builtin-variables
 .DEFAULT_GOAL := help
 
 #
+# Go
+#
+.PHONY: build
+build: ## build executable binary
+	go build -o bin/bump
+
+#
 # Help
 #
 .PHONY: help
