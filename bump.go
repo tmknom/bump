@@ -25,6 +25,15 @@ func (c *MinorCommand) Run(filename string) error {
 	return cmd.Run(filename, MINOR)
 }
 
+// PatchCommand is a command which bump up patch version.
+type PatchCommand struct{}
+
+// Run runs the procedure of this command.
+func (c *PatchCommand) Run(filename string) error {
+	cmd := &UpCommand{}
+	return cmd.Run(filename, PATCH)
+}
+
 // UpCommand is a command which bump up version.
 type UpCommand struct{}
 
