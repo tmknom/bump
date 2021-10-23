@@ -30,7 +30,7 @@ build: ## build executable binary
 	go build -o bin/bump ./cmd/bump
 
 .PHONY: lint
-lint: fmt vet staticcheck ## lint all
+lint: goimports vet staticcheck ## lint all
 
 .PHONY: staticcheck
 staticcheck: ## static analysis by staticcheck
