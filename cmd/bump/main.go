@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/tmknom/bump/command"
+	"github.com/tmknom/bump"
 	"log"
 	"os"
 )
@@ -27,13 +27,13 @@ func handle() error {
 	flag.Parse()
 	switch flag.Arg(0) {
 	case "init":
-		cmd := &command.InitCommand{}
+		cmd := &bump.InitCommand{}
 		return cmd.Run(InitialVersion, VersionFile)
 	case "show":
-		cmd := &command.ShowCommand{}
+		cmd := &bump.ShowCommand{}
 		return cmd.Run(VersionFile)
 	case "up":
-		cmd := &command.UpCommand{}
+		cmd := &bump.UpCommand{}
 		return cmd.Run(VersionFile)
 	}
 	return nil
