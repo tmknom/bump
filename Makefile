@@ -28,6 +28,9 @@ install: ## install dev tools
 build: ## build executable binary
 	go build -o bin/bump
 
+.PHONY: lint
+lint: fmt vet staticcheck ## lint all
+
 .PHONY: staticcheck
 staticcheck: ## static analysis by staticcheck
 	staticcheck ./...
