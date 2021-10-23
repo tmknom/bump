@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/tmknom/bump"
 	"log"
 	"os"
+
+	"github.com/tmknom/bump"
 )
 
 const VersionFile = "VERSION"
