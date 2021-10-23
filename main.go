@@ -29,6 +29,9 @@ func handle() error {
 	case "init":
 		cmd := &command.InitCommand{}
 		return cmd.Run(InitialVersion, VersionFile)
+	case "show":
+		cmd := &command.ShowCommand{}
+		return cmd.Run(VersionFile)
 	}
 	return nil
 }
