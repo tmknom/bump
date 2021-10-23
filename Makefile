@@ -44,10 +44,6 @@ vet: ## static analysis by vet
 goimports: ## update import lines
 	goimports -w .
 
-.PHONY: fmt
-fmt: ## format code
-	go fmt ./...
-
 #
 # Help
 #
