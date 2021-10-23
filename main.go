@@ -32,6 +32,9 @@ func handle() error {
 	case "show":
 		cmd := &command.ShowCommand{}
 		return cmd.Run(VersionFile)
+	case "up":
+		cmd := &command.UpCommand{}
+		return cmd.Run(VersionFile)
 	}
 	return nil
 }
