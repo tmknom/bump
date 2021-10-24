@@ -36,6 +36,9 @@ func handle() error {
 	case "minor":
 		cmd := &bump.MinorCommand{}
 		return cmd.Run(VersionFile)
+	case "patch":
+		cmd := &bump.PatchCommand{}
+		return cmd.Run(VersionFile)
 	case "show":
 		cmd := &bump.ShowCommand{}
 		return cmd.Run(VersionFile)
