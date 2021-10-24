@@ -10,7 +10,7 @@ import (
 
 func main() {
 	if len(os.Args) == 1 {
-		fmt.Fprintln(os.Stderr, "Usage: bump <subcommand> [flags]")
+		fmt.Fprintln(os.Stderr, "Usage: bump <subcommand> [version] [flags]")
 		os.Exit(0)
 	}
 

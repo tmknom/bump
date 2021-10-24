@@ -6,31 +6,37 @@ import (
 )
 
 // MajorCommand is a command which bump up major version.
-type MajorCommand struct{}
+type MajorCommand struct {
+	version string
+}
 
 // Run runs the procedure of this command.
 func (c *MajorCommand) Run(filename string) error {
-	return runBump(filename, MAJOR)
+	return runBump(c.version, filename, MAJOR)
 }
 
 // MinorCommand is a command which bump up minor version.
-type MinorCommand struct{}
+type MinorCommand struct {
+	version string
+}
 
 // Run runs the procedure of this command.
 func (c *MinorCommand) Run(filename string) error {
-	return runBump(filename, MINOR)
+	return runBump(c.version, filename, MINOR)
 }
 
 // PatchCommand is a command which bump up patch version.
-type PatchCommand struct{}
+type PatchCommand struct {
+	version string
+}
 
 // Run runs the procedure of this command.
 func (c *PatchCommand) Run(filename string) error {
-	return runBump(filename, PATCH)
+	return runBump(c.version, filename, PATCH)
 }
 
-func runBump(filename string, versionType VersionType) error {
-	bump := NewBump(filename, versionType)
+func runBump(currentVersion string, filename string, versionType VersionType) error {
+	bump := NewBump(currentVersion, filename, versionType)
 	version, err := bump.Up()
 	if err != nil {
 		return err
@@ -41,13 +47,15 @@ func runBump(filename string, versionType VersionType) error {
 
 // Bump wraps the basic bump up method.
 type Bump struct {
+	current     string
 	path        string
 	versionType VersionType
 }
 
 // NewBump constructs a new Bump.
-func NewBump(path string, versionType VersionType) *Bump {
+func NewBump(current string, path string, versionType VersionType) *Bump {
 	return &Bump{
+		current:     current,
 		path:        path,
 		versionType: versionType,
 	}
@@ -55,9 +63,32 @@ func NewBump(path string, versionType VersionType) *Bump {
 
 // Up increments the current version.
 func (b *Bump) Up() (*Version, error) {
+	if len(b.current) != 0 {
+		return b.upFromCommandLine()
+	}
+	return b.upFromFile()
+}
+
+func (b *Bump) upFromFile() (*Version, error) {
 	file := NewVersionIO(b.path)
 
 	version, err := file.Read()
+	if err != nil {
+		return nil, err
+	}
+
+	err = version.up(b.versionType)
+	if err != nil {
+		return nil, err
+	}
+
+	return file.Write(version)
+}
+
+func (b *Bump) upFromCommandLine() (*Version, error) {
+	file := NewVersionIO(b.path)
+
+	version, err := toVersion(b.current)
 	if err != nil {
 		return nil, err
 	}
