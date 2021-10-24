@@ -18,11 +18,20 @@ MAKEFLAGS += --no-builtin-variables
 .DEFAULT_GOAL := help
 
 #
-# Build
+# Build and run
 #
 .PHONY: build
 build: ## build executable binary
 	go build -o bin/bump ./cmd/bump
+
+.PHONY: run
+run: build ## run bump command for test
+	bin/bump init
+	bin/bump show
+	bin/bump patch
+	bin/bump minor
+	bin/bump major
+	@$(MAKE) clean
 
 #
 # Development
