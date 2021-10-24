@@ -7,20 +7,20 @@ import (
 	"strings"
 )
 
-// VersionFile wraps the I/O method for the version file.
-type VersionFile struct {
+// VersionIO wraps the I/O method for the version file.
+type VersionIO struct {
 	path string
 }
 
-// NewVersionFile constructs a new VersionFile.
-func NewVersionFile(path string) *VersionFile {
-	return &VersionFile{
+// NewVersionIO constructs a new VersionIO.
+func NewVersionIO(path string) *VersionIO {
+	return &VersionIO{
 		path: path,
 	}
 }
 
 // Read reads the version file and returns the current version.
-func (f *VersionFile) Read() (*Version, error) {
+func (f *VersionIO) Read() (*Version, error) {
 	bytes, err := os.ReadFile(f.path)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (f *VersionFile) Read() (*Version, error) {
 }
 
 // Write writes the version to the version file.
-func (f *VersionFile) Write(version *Version) (*Version, error) {
+func (f *VersionIO) Write(version *Version) (*Version, error) {
 	file, err := os.Create(f.path)
 	if err != nil {
 		return nil, err

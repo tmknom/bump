@@ -55,7 +55,7 @@ func NewBump(path string, versionType VersionType) *Bump {
 
 // Up increments the current version.
 func (b *Bump) Up() (*Version, error) {
-	file := NewVersionFile(b.path)
+	file := NewVersionIO(b.path)
 
 	version, err := file.Read()
 	if err != nil {
