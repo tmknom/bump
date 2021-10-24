@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func Handle(argv []string) error {
+func Handle(argv []string, outStream io.Writer) error {
 	if len(argv) == 0 {
 		return printHelp(os.Stderr)
 	}
@@ -21,19 +21,33 @@ func Handle(argv []string) error {
 
 	switch flag.Arg(0) {
 	case "init":
-		cmd := &InitCommand{version: argVersion}
+		cmd := &InitCommand{
+			version:   argVersion,
+			outStream: outStream,
+		}
 		return cmd.Run()
 	case "major":
-		cmd := &MajorCommand{version: argVersion}
+		cmd := &MajorCommand{
+			version:   argVersion,
+			outStream: outStream,
+		}
 		return cmd.Run()
 	case "minor":
-		cmd := &MinorCommand{version: argVersion}
+		cmd := &MinorCommand{
+			version:   argVersion,
+			outStream: outStream,
+		}
 		return cmd.Run()
 	case "patch":
-		cmd := &PatchCommand{version: argVersion}
+		cmd := &PatchCommand{
+			version:   argVersion,
+			outStream: outStream,
+		}
 		return cmd.Run()
 	case "show":
-		cmd := &ShowCommand{}
+		cmd := &ShowCommand{
+			outStream: outStream,
+		}
 		return cmd.Run()
 	}
 	return nil
