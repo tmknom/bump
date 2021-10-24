@@ -30,12 +30,15 @@ func handle() error {
 	case "init":
 		cmd := &bump.InitCommand{}
 		return cmd.Run(InitialVersion, VersionFile)
+	case "minor":
+		cmd := &bump.MinorCommand{}
+		return cmd.Run(VersionFile)
 	case "show":
 		cmd := &bump.ShowCommand{}
 		return cmd.Run(VersionFile)
 	case "up":
 		cmd := &bump.UpCommand{}
-		return cmd.Run(VersionFile)
+		return cmd.Run(VersionFile, bump.MINOR)
 	}
 	return nil
 }
