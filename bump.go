@@ -2,42 +2,46 @@ package bump
 
 import (
 	"fmt"
-	"os"
+	"io"
 )
 
 // MajorCommand is a command which bump up major version.
 type MajorCommand struct {
-	version string
+	version   string
+	outStream io.Writer
 }
 
 // Run runs the procedure of this command.
 func (c *MajorCommand) Run() error {
-	return runBump(c.version, MAJOR)
+	return runBump(c.outStream, c.version, MAJOR)
 }
 
 // MinorCommand is a command which bump up minor version.
 type MinorCommand struct {
-	version string
+	version   string
+	outStream io.Writer
 }
 
 // Run runs the procedure of this command.
 func (c *MinorCommand) Run() error {
-	return runBump(c.version, MINOR)
+	return runBump(c.outStream, c.version, MINOR)
 }
 
 // PatchCommand is a command which bump up patch version.
 type PatchCommand struct {
-	version string
+	version   string
+	outStream io.Writer
 }
 
 // Run runs the procedure of this command.
 func (c *PatchCommand) Run() error {
-	return runBump(c.version, PATCH)
+	return runBump(c.outStream, c.version, PATCH)
 }
 
 // InitCommand is a command which inits a new version file.
 type InitCommand struct {
-	version string
+	version   string
+	outStream io.Writer
 }
 
 const defaultInitialVersion = "0.1.0"
@@ -59,12 +63,14 @@ func (c *InitCommand) Run() error {
 		return err
 	}
 
-	fmt.Fprintln(os.Stdout, v.string())
+	fmt.Fprintln(c.outStream, v.string())
 	return nil
 }
 
 // ShowCommand is a command which show current version.
-type ShowCommand struct{}
+type ShowCommand struct {
+	outStream io.Writer
+}
 
 // Run runs the procedure of this command.
 func (c *ShowCommand) Run() error {
@@ -75,17 +81,17 @@ func (c *ShowCommand) Run() error {
 		return err
 	}
 
-	fmt.Fprintln(os.Stdout, version.string())
+	fmt.Fprintln(c.outStream, version.string())
 	return nil
 }
 
-func runBump(currentVersion string, versionType VersionType) error {
+func runBump(outStream io.Writer, currentVersion string, versionType VersionType) error {
 	bump := NewBump(currentVersion, versionType)
 	version, err := bump.Up()
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(os.Stdout, version.string())
+	fmt.Fprintln(outStream, version.string())
 	return nil
 }
 
