@@ -18,16 +18,19 @@ MAKEFLAGS += --no-builtin-variables
 .DEFAULT_GOAL := help
 
 #
-# Go
+# Build
+#
+.PHONY: build
+build: ## build executable binary
+	go build -o bin/bump ./cmd/bump
+
+#
+# Development
 #
 .PHONY: install
 install: ## install dev tools
 	go install golang.org/x/tools/cmd/goimports@latest
 	go install honnef.co/go/tools/cmd/staticcheck@latest
-
-.PHONY: build
-build: ## build executable binary
-	go build -o bin/bump ./cmd/bump
 
 .PHONY: lint
 lint: goimports vet staticcheck ## lint all
