@@ -12,8 +12,7 @@ type MajorCommand struct{}
 
 // Run runs the procedure of this command.
 func (c *MajorCommand) Run(filename string) error {
-	bump := NewBump(filename, MAJOR)
-	return bump.Up()
+	return runBump(filename, MAJOR)
 }
 
 // MinorCommand is a command which bump up minor version.
@@ -21,8 +20,7 @@ type MinorCommand struct{}
 
 // Run runs the procedure of this command.
 func (c *MinorCommand) Run(filename string) error {
-	bump := NewBump(filename, MINOR)
-	return bump.Up()
+	return runBump(filename, MINOR)
 }
 
 // PatchCommand is a command which bump up patch version.
@@ -30,8 +28,17 @@ type PatchCommand struct{}
 
 // Run runs the procedure of this command.
 func (c *PatchCommand) Run(filename string) error {
-	bump := NewBump(filename, PATCH)
-	return bump.Up()
+	return runBump(filename, PATCH)
+}
+
+func runBump(filename string, versionType VersionType) error {
+	bump := NewBump(filename, versionType)
+	version, err := bump.Up()
+	if err != nil {
+		return err
+	}
+	fmt.Fprintln(os.Stdout, version)
+	return nil
 }
 
 // Bump wraps the basic bump up method.
@@ -49,31 +56,30 @@ func NewBump(path string, versionType VersionType) *Bump {
 }
 
 // Up increments the current version.
-func (b *Bump) Up() error {
+func (b *Bump) Up() (string, error) {
 	file := NewVersionFile(b.path)
 
 	currentVersion, err := file.Read()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	version, err := toVersion(currentVersion)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = version.up(b.versionType)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = file.Write(version.string())
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Fprintln(os.Stdout, version.string())
-	return nil
+	return version.string(), nil
 }
 
 // VersionFile wraps the I/O method for the version file.
