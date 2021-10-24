@@ -44,6 +44,11 @@ vet: ## static analysis by vet
 goimports: ## update import lines
 	goimports -w .
 
+.PHONY: clean
+clean: ## clean files
+	rm -rf ./bin
+	rm -rf ./VERSION
+
 #
 # Help
 #
