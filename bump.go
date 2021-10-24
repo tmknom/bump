@@ -54,6 +54,20 @@ func (c *InitCommand) Run(version string, filename string) error {
 	return nil
 }
 
+// ShowCommand is a command which show current version.
+type ShowCommand struct{}
+
+// Run runs the procedure of this command.
+func (c *ShowCommand) Run(filename string) error {
+	version, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintln(os.Stdout, string(version))
+	return nil
+}
+
 func runBump(currentVersion string, filename string, versionType VersionType) error {
 	bump := NewBump(currentVersion, filename, versionType)
 	version, err := bump.Up()
