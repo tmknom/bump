@@ -1,11 +1,20 @@
 package bump
 
-import "flag"
+import (
+	"flag"
+	"fmt"
+	"io"
+	"os"
+)
 
 const VersionFile = "VERSION"
 const InitialVersion = "0.1.0"
 
-func Handle() error {
+func Handle(argv []string) error {
+	if len(argv) == 0 {
+		return printHelp(os.Stderr)
+	}
+
 	flag.Parse()
 
 	var argVersion string
@@ -31,4 +40,12 @@ func Handle() error {
 		return cmd.Run(VersionFile)
 	}
 	return nil
+}
+
+func printHelp(out io.Writer) error {
+	_, err := fmt.Fprintln(out, "Usage: bump <subcommand> [<version>] [flags]")
+	if err != nil {
+		return err
+	}
+	return flag.ErrHelp
 }
