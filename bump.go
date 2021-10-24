@@ -37,7 +37,7 @@ func runBump(filename string, versionType VersionType) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(os.Stdout, version)
+	fmt.Fprintln(os.Stdout, version.string())
 	return nil
 }
 
@@ -56,30 +56,20 @@ func NewBump(path string, versionType VersionType) *Bump {
 }
 
 // Up increments the current version.
-func (b *Bump) Up() (string, error) {
+func (b *Bump) Up() (*Version, error) {
 	file := NewVersionFile(b.path)
 
-	currentVersion, err := file.Read()
+	version, err := file.Read()
 	if err != nil {
-		return "", err
-	}
-
-	version, err := toVersion(currentVersion)
-	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	err = version.up(b.versionType)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	err = file.Write(version.string())
-	if err != nil {
-		return "", err
-	}
-
-	return version.string(), nil
+	return file.Write(version)
 }
 
 // VersionFile wraps the I/O method for the version file.
@@ -95,27 +85,27 @@ func NewVersionFile(path string) *VersionFile {
 }
 
 // Read reads the version file and returns the current version.
-func (f *VersionFile) Read() (string, error) {
+func (f *VersionFile) Read() (*Version, error) {
 	bytes, err := os.ReadFile(f.path)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(bytes), nil
+	return toVersion(string(bytes))
 }
 
 // Write writes the version to the version file.
-func (f *VersionFile) Write(version string) error {
+func (f *VersionFile) Write(version *Version) (*Version, error) {
 	file, err := os.Create(f.path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer file.Close()
 
-	_, err = file.WriteString(strings.TrimSpace(version) + "\n")
+	_, err = file.WriteString(version.string() + "\n")
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return version, nil
 }
 
 type VersionType int
