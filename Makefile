@@ -36,8 +36,8 @@ run: build ## run bump command for test
 #
 # Development
 #
-.PHONY: install
-install: ## install dev tools
+.PHONY: install-tools
+install-tools: ## install tools for development
 	go install golang.org/x/tools/cmd/goimports@latest
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 
