@@ -15,7 +15,7 @@ func Handle() error {
 
 	switch flag.Arg(0) {
 	case "init":
-		cmd := &InitCommand{}
+		cmd := &InitCommand{version: argVersion}
 		return cmd.Run(InitialVersion, VersionFile)
 	case "major":
 		cmd := &MajorCommand{version: argVersion}
