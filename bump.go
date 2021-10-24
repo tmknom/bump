@@ -7,6 +7,15 @@ import (
 	"strings"
 )
 
+// MajorCommand is a command which bump up major version.
+type MajorCommand struct{}
+
+// Run runs the procedure of this command.
+func (c *MajorCommand) Run(filename string) error {
+	cmd := &UpCommand{}
+	return cmd.Run(filename, MAJOR)
+}
+
 // MinorCommand is a command which bump up minor version.
 type MinorCommand struct{}
 
