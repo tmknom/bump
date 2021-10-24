@@ -36,21 +36,28 @@ func (c *PatchCommand) Run(filename string) error {
 }
 
 // InitCommand is a command which inits a new version file.
-type InitCommand struct{}
+type InitCommand struct {
+	version string
+}
 
 // Run runs the procedure of this command.
 func (c *InitCommand) Run(version string, filename string) error {
-	file, err := os.Create(filename)
+	file := NewVersionIO(filename)
+
+	if len(c.version) != 0 {
+		version = c.version
+	}
+	v, err := toVersion(version)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
-	_, err = file.WriteString(version + "\n")
+	v, err = file.Write(v)
 	if err != nil {
 		return err
 	}
 
+	fmt.Fprintln(os.Stdout, v.string())
 	return nil
 }
 
