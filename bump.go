@@ -66,12 +66,14 @@ type ShowCommand struct{}
 
 // Run runs the procedure of this command.
 func (c *ShowCommand) Run(filename string) error {
-	version, err := os.ReadFile(filename)
+	file := NewVersionIO(filename)
+
+	version, err := file.Read()
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprintln(os.Stdout, string(version))
+	fmt.Fprintln(os.Stdout, version.string())
 	return nil
 }
 
