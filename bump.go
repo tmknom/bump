@@ -57,22 +57,22 @@ func (b *Bump) Up() error {
 		return err
 	}
 
-	versioning, err := toVersioning(currentVersion)
+	version, err := toVersion(currentVersion)
 	if err != nil {
 		return err
 	}
 
-	err = versioning.up(b.versionType)
+	err = version.up(b.versionType)
 	if err != nil {
 		return err
 	}
 
-	err = file.Write(versioning.string())
+	err = file.Write(version.string())
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprintln(os.Stdout, versioning.string())
+	fmt.Fprintln(os.Stdout, version.string())
 	return nil
 }
 
@@ -121,8 +121,8 @@ const (
 	PATCH
 )
 
-// Versioning takes the form X.Y.Z: X is the major version, Y is the minor version, and Z is the patch version.
-type Versioning struct {
+// Version takes the form X.Y.Z: X is the major version, Y is the minor version, and Z is the patch version.
+type Version struct {
 	major
 	minor
 	patch
@@ -132,7 +132,7 @@ type major int
 type minor int
 type patch int
 
-func toVersioning(version string) (*Versioning, error) {
+func toVersion(version string) (*Version, error) {
 	versions := strings.Split(strings.TrimSpace(version), ".")
 	x, err := strconv.Atoi(versions[0])
 	if err != nil {
@@ -149,22 +149,22 @@ func toVersioning(version string) (*Versioning, error) {
 		return nil, err
 	}
 
-	return newVersioning(major(x), minor(y), patch(z)), nil
+	return newVersion(major(x), minor(y), patch(z)), nil
 }
 
-func newVersioning(x major, y minor, z patch) *Versioning {
-	return &Versioning{
+func newVersion(x major, y minor, z patch) *Version {
+	return &Version{
 		major: x,
 		minor: y,
 		patch: z,
 	}
 }
 
-func (v *Versioning) string() string {
+func (v *Version) string() string {
 	return fmt.Sprintf("%d.%d.%d", v.major, v.minor, v.patch)
 }
 
-func (v *Versioning) up(t VersionType) error {
+func (v *Version) up(t VersionType) error {
 	switch t {
 	case MAJOR:
 		v.upMajor()
@@ -178,17 +178,17 @@ func (v *Versioning) up(t VersionType) error {
 	return nil
 }
 
-func (v *Versioning) upMajor() {
+func (v *Version) upMajor() {
 	v.major += 1
 	v.minor = 0
 	v.patch = 0
 }
 
-func (v *Versioning) upMinor() {
+func (v *Version) upMinor() {
 	v.minor += 1
 	v.patch = 0
 }
 
-func (v *Versioning) upPatch() {
+func (v *Version) upPatch() {
 	v.patch += 1
 }
