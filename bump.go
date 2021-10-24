@@ -11,8 +11,8 @@ type MajorCommand struct {
 }
 
 // Run runs the procedure of this command.
-func (c *MajorCommand) Run(filename string) error {
-	return runBump(c.version, filename, MAJOR)
+func (c *MajorCommand) Run() error {
+	return runBump(c.version, MAJOR)
 }
 
 // MinorCommand is a command which bump up minor version.
@@ -21,8 +21,8 @@ type MinorCommand struct {
 }
 
 // Run runs the procedure of this command.
-func (c *MinorCommand) Run(filename string) error {
-	return runBump(c.version, filename, MINOR)
+func (c *MinorCommand) Run() error {
+	return runBump(c.version, MINOR)
 }
 
 // PatchCommand is a command which bump up patch version.
@@ -31,8 +31,8 @@ type PatchCommand struct {
 }
 
 // Run runs the procedure of this command.
-func (c *PatchCommand) Run(filename string) error {
-	return runBump(c.version, filename, PATCH)
+func (c *PatchCommand) Run() error {
+	return runBump(c.version, PATCH)
 }
 
 // InitCommand is a command which inits a new version file.
@@ -40,14 +40,16 @@ type InitCommand struct {
 	version string
 }
 
-// Run runs the procedure of this command.
-func (c *InitCommand) Run(version string, filename string) error {
-	file := NewVersionIO(filename)
+const defaultInitialVersion = "0.1.0"
 
-	if len(c.version) != 0 {
-		version = c.version
+// Run runs the procedure of this command.
+func (c *InitCommand) Run() error {
+	file := NewVersionIO()
+
+	if len(c.version) == 0 {
+		c.version = defaultInitialVersion
 	}
-	v, err := toVersion(version)
+	v, err := toVersion(c.version)
 	if err != nil {
 		return err
 	}
@@ -65,8 +67,8 @@ func (c *InitCommand) Run(version string, filename string) error {
 type ShowCommand struct{}
 
 // Run runs the procedure of this command.
-func (c *ShowCommand) Run(filename string) error {
-	file := NewVersionIO(filename)
+func (c *ShowCommand) Run() error {
+	file := NewVersionIO()
 
 	version, err := file.Read()
 	if err != nil {
@@ -77,8 +79,8 @@ func (c *ShowCommand) Run(filename string) error {
 	return nil
 }
 
-func runBump(currentVersion string, filename string, versionType VersionType) error {
-	bump := NewBump(currentVersion, filename, versionType)
+func runBump(currentVersion string, versionType VersionType) error {
+	bump := NewBump(currentVersion, versionType)
 	version, err := bump.Up()
 	if err != nil {
 		return err
@@ -90,15 +92,13 @@ func runBump(currentVersion string, filename string, versionType VersionType) er
 // Bump wraps the basic bump up method.
 type Bump struct {
 	current     string
-	path        string
 	versionType VersionType
 }
 
 // NewBump constructs a new Bump.
-func NewBump(current string, path string, versionType VersionType) *Bump {
+func NewBump(current string, versionType VersionType) *Bump {
 	return &Bump{
 		current:     current,
-		path:        path,
 		versionType: versionType,
 	}
 }
@@ -112,7 +112,7 @@ func (b *Bump) Up() (*Version, error) {
 }
 
 func (b *Bump) upFromFile() (*Version, error) {
-	file := NewVersionIO(b.path)
+	file := NewVersionIO()
 
 	version, err := file.Read()
 	if err != nil {
@@ -128,7 +128,7 @@ func (b *Bump) upFromFile() (*Version, error) {
 }
 
 func (b *Bump) upFromCommandLine() (*Version, error) {
-	file := NewVersionIO(b.path)
+	file := NewVersionIO()
 
 	version, err := toVersion(b.current)
 	if err != nil {
