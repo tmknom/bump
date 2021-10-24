@@ -7,15 +7,17 @@ import (
 	"strings"
 )
 
+const defaultVersionFile = "VERSION"
+
 // VersionIO wraps the I/O method for the version file.
 type VersionIO struct {
 	path string
 }
 
 // NewVersionIO constructs a new VersionIO.
-func NewVersionIO(path string) *VersionIO {
+func NewVersionIO() *VersionIO {
 	return &VersionIO{
-		path: path,
+		path: defaultVersionFile,
 	}
 }
 

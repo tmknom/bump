@@ -7,9 +7,6 @@ import (
 	"os"
 )
 
-const VersionFile = "VERSION"
-const InitialVersion = "0.1.0"
-
 func Handle(argv []string) error {
 	if len(argv) == 0 {
 		return printHelp(os.Stderr)
@@ -25,19 +22,19 @@ func Handle(argv []string) error {
 	switch flag.Arg(0) {
 	case "init":
 		cmd := &InitCommand{version: argVersion}
-		return cmd.Run(InitialVersion, VersionFile)
+		return cmd.Run()
 	case "major":
 		cmd := &MajorCommand{version: argVersion}
-		return cmd.Run(VersionFile)
+		return cmd.Run()
 	case "minor":
 		cmd := &MinorCommand{version: argVersion}
-		return cmd.Run(VersionFile)
+		return cmd.Run()
 	case "patch":
 		cmd := &PatchCommand{version: argVersion}
-		return cmd.Run(VersionFile)
+		return cmd.Run()
 	case "show":
 		cmd := &ShowCommand{}
-		return cmd.Run(VersionFile)
+		return cmd.Run()
 	}
 	return nil
 }
