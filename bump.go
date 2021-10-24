@@ -12,8 +12,8 @@ type MajorCommand struct{}
 
 // Run runs the procedure of this command.
 func (c *MajorCommand) Run(filename string) error {
-	cmd := &UpCommand{}
-	return cmd.Run(filename, MAJOR)
+	bump := NewBump(filename, MAJOR)
+	return bump.Up()
 }
 
 // MinorCommand is a command which bump up minor version.
@@ -21,8 +21,8 @@ type MinorCommand struct{}
 
 // Run runs the procedure of this command.
 func (c *MinorCommand) Run(filename string) error {
-	cmd := &UpCommand{}
-	return cmd.Run(filename, MINOR)
+	bump := NewBump(filename, MINOR)
+	return bump.Up()
 }
 
 // PatchCommand is a command which bump up patch version.
@@ -30,37 +30,44 @@ type PatchCommand struct{}
 
 // Run runs the procedure of this command.
 func (c *PatchCommand) Run(filename string) error {
-	cmd := &UpCommand{}
-	return cmd.Run(filename, PATCH)
+	bump := NewBump(filename, PATCH)
+	return bump.Up()
 }
 
-// UpCommand is a command which bump up version.
-type UpCommand struct{}
+// Bump wraps the basic bump up method.
+type Bump struct {
+	path        string
+	versionType VersionType
+}
 
-// Run runs the procedure of this command.
-func (c *UpCommand) Run(filename string, versionType VersionType) error {
-	version, err := os.ReadFile(filename)
+// NewBump constructs a new Bump.
+func NewBump(path string, versionType VersionType) *Bump {
+	return &Bump{
+		path:        path,
+		versionType: versionType,
+	}
+}
+
+// Up increments the current version.
+func (b *Bump) Up() error {
+	file := NewVersionFile(b.path)
+
+	currentVersion, err := file.Read()
 	if err != nil {
 		return err
 	}
 
-	versioning, err := toVersioning(string(version))
+	versioning, err := toVersioning(currentVersion)
 	if err != nil {
 		return err
 	}
 
-	err = versioning.up(versionType)
+	err = versioning.up(b.versionType)
 	if err != nil {
 		return err
 	}
 
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = file.WriteString(versioning.string() + "\n")
+	err = file.Write(versioning.string())
 	if err != nil {
 		return err
 	}
