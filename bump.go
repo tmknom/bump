@@ -10,37 +10,41 @@ import (
 type MajorCommand struct {
 	args      []string
 	outStream io.Writer
+	errStream io.Writer
 }
 
 // Run runs the procedure of this command.
 func (c *MajorCommand) Run() error {
-	return parseAndUp("major", c.args, c.outStream, MAJOR)
+	return parseAndUp("major", c.args, c.outStream, c.errStream, MAJOR)
 }
 
 // MinorCommand is a command which bump up minor version.
 type MinorCommand struct {
 	args      []string
 	outStream io.Writer
+	errStream io.Writer
 }
 
 // Run runs the procedure of this command.
 func (c *MinorCommand) Run() error {
-	return parseAndUp("minor", c.args, c.outStream, MINOR)
+	return parseAndUp("minor", c.args, c.outStream, c.errStream, MINOR)
 }
 
 // PatchCommand is a command which bump up patch version.
 type PatchCommand struct {
 	args      []string
 	outStream io.Writer
+	errStream io.Writer
 }
 
 // Run runs the procedure of this command.
 func (c *PatchCommand) Run() error {
-	return parseAndUp("patch", c.args, c.outStream, PATCH)
+	return parseAndUp("patch", c.args, c.outStream, c.errStream, PATCH)
 }
 
-func parseAndUp(subcommand string, args []string, outStream io.Writer, versionType VersionType) error {
+func parseAndUp(subcommand string, args []string, outStream, errStream io.Writer, versionType VersionType) error {
 	fs := flag.NewFlagSet(fmt.Sprintf("bump %s", subcommand), flag.ContinueOnError)
+	fs.SetOutput(errStream)
 	err := fs.Parse(args)
 	if err != nil {
 		return err
@@ -62,6 +66,7 @@ func parseAndUp(subcommand string, args []string, outStream io.Writer, versionTy
 type InitCommand struct {
 	args      []string
 	outStream io.Writer
+	errStream io.Writer
 }
 
 const defaultInitialVersion = "0.1.0"
@@ -69,6 +74,7 @@ const defaultInitialVersion = "0.1.0"
 // Run runs the procedure of this command.
 func (c *InitCommand) Run() error {
 	fs := flag.NewFlagSet("bump init", flag.ContinueOnError)
+	fs.SetOutput(c.errStream)
 	err := fs.Parse(c.args)
 	if err != nil {
 		return err
@@ -98,10 +104,14 @@ func (c *InitCommand) Run() error {
 type ShowCommand struct {
 	args      []string
 	outStream io.Writer
+	errStream io.Writer
 }
 
 // Run runs the procedure of this command.
 func (c *ShowCommand) Run() error {
+	fs := flag.NewFlagSet("bump show", flag.ContinueOnError)
+	fs.SetOutput(c.errStream)
+
 	file := NewVersionIO()
 
 	version, err := file.Read()
