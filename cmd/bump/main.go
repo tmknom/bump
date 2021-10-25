@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	err := bump.Handle(os.Args[1:], os.Stdout)
+	err := bump.Handle(os.Args[1:], os.Stdout, os.Stderr)
 	if err != nil && err != flag.ErrHelp {
 		log.Fatalln(err)
 	}
