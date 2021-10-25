@@ -4,48 +4,48 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"os"
 )
 
-func Handle(argv []string, outStream io.Writer) error {
-	if len(argv) == 0 {
-		return printHelp(os.Stderr)
+func Handle(args []string, outStream, errStream io.Writer) error {
+	fs := flag.NewFlagSet("bump", flag.ContinueOnError)
+	fs.SetOutput(errStream)
+	err := fs.Parse(args)
+	if err != nil {
+		return err
 	}
 
-	flag.Parse()
-
-	var argVersion string
-	if flag.NArg() > 1 {
-		argVersion = flag.Arg(1)
+	if fs.NArg() == 0 {
+		return printHelp(errStream)
 	}
 
-	switch flag.Arg(0) {
+	switch fs.Arg(0) {
 	case "init":
 		cmd := &InitCommand{
-			version:   argVersion,
+			args:      args[1:],
 			outStream: outStream,
 		}
 		return cmd.Run()
 	case "major":
 		cmd := &MajorCommand{
-			version:   argVersion,
+			args:      args[1:],
 			outStream: outStream,
 		}
 		return cmd.Run()
 	case "minor":
 		cmd := &MinorCommand{
-			version:   argVersion,
+			args:      args[1:],
 			outStream: outStream,
 		}
 		return cmd.Run()
 	case "patch":
 		cmd := &PatchCommand{
-			version:   argVersion,
+			args:      args[1:],
 			outStream: outStream,
 		}
 		return cmd.Run()
 	case "show":
 		cmd := &ShowCommand{
+			args:      args[1:],
 			outStream: outStream,
 		}
 		return cmd.Run()
