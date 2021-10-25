@@ -8,9 +8,10 @@ import (
 
 // MajorCommand is a command which bump up major version.
 type MajorCommand struct {
-	args      []string
-	outStream io.Writer
-	errStream io.Writer
+	versionFile string
+	args        []string
+	outStream   io.Writer
+	errStream   io.Writer
 }
 
 // Run runs the procedure of this command.
@@ -20,9 +21,10 @@ func (c *MajorCommand) Run() error {
 
 // MinorCommand is a command which bump up minor version.
 type MinorCommand struct {
-	args      []string
-	outStream io.Writer
-	errStream io.Writer
+	versionFile string
+	args        []string
+	outStream   io.Writer
+	errStream   io.Writer
 }
 
 // Run runs the procedure of this command.
@@ -32,9 +34,10 @@ func (c *MinorCommand) Run() error {
 
 // PatchCommand is a command which bump up patch version.
 type PatchCommand struct {
-	args      []string
-	outStream io.Writer
-	errStream io.Writer
+	versionFile string
+	args        []string
+	outStream   io.Writer
+	errStream   io.Writer
 }
 
 // Run runs the procedure of this command.
@@ -45,6 +48,10 @@ func (c *PatchCommand) Run() error {
 func parseAndUp(subcommand string, args []string, outStream, errStream io.Writer, versionType VersionType) error {
 	fs := flag.NewFlagSet(fmt.Sprintf("bump %s", subcommand), flag.ContinueOnError)
 	fs.SetOutput(errStream)
+
+	var versionFile string
+	fs.StringVar(&versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
+
 	err := fs.Parse(args)
 	if err != nil {
 		return err
@@ -58,15 +65,16 @@ func parseAndUp(subcommand string, args []string, outStream, errStream io.Writer
 		}
 	}
 
-	bump := NewBump(version, versionType, outStream)
+	bump := NewBump(version, versionType, versionFile, outStream)
 	return bump.Up()
 }
 
 // InitCommand is a command which inits a new version file.
 type InitCommand struct {
-	args      []string
-	outStream io.Writer
-	errStream io.Writer
+	versionFile string
+	args        []string
+	outStream   io.Writer
+	errStream   io.Writer
 }
 
 const defaultInitialVersion = "0.1.0"
@@ -75,6 +83,7 @@ const defaultInitialVersion = "0.1.0"
 func (c *InitCommand) Run() error {
 	fs := flag.NewFlagSet("bump init", flag.ContinueOnError)
 	fs.SetOutput(c.errStream)
+	fs.StringVar(&c.versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
 	err := fs.Parse(c.args)
 	if err != nil {
 		return err
@@ -85,34 +94,40 @@ func (c *InitCommand) Run() error {
 		strVersion = fs.Arg(0)
 	}
 
-	v, err := toVersion(strVersion)
+	version, err := toVersion(strVersion)
 	if err != nil {
 		return err
 	}
 
-	file := NewVersionIO()
-	v, err = file.Write(v)
+	file := NewVersionIO(c.versionFile)
+	version, err = file.Write(version)
 	if err != nil {
 		return err
 	}
 
-	_, err = fmt.Fprintln(c.outStream, v.string())
+	_, err = fmt.Fprintln(c.outStream, version.string())
 	return err
 }
 
 // ShowCommand is a command which show current version.
 type ShowCommand struct {
-	args      []string
-	outStream io.Writer
-	errStream io.Writer
+	versionFile string
+	args        []string
+	outStream   io.Writer
+	errStream   io.Writer
 }
 
 // Run runs the procedure of this command.
 func (c *ShowCommand) Run() error {
 	fs := flag.NewFlagSet("bump show", flag.ContinueOnError)
 	fs.SetOutput(c.errStream)
+	fs.StringVar(&c.versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
+	err := fs.Parse(c.args)
+	if err != nil {
+		return err
+	}
 
-	file := NewVersionIO()
+	file := NewVersionIO(c.versionFile)
 
 	version, err := file.Read()
 	if err != nil {
@@ -127,14 +142,16 @@ func (c *ShowCommand) Run() error {
 type Bump struct {
 	version     *Version
 	versionType VersionType
+	versionFile string
 	outStream   io.Writer
 }
 
 // NewBump constructs a new Bump.
-func NewBump(version *Version, versionType VersionType, outStream io.Writer) *Bump {
+func NewBump(version *Version, versionType VersionType, versionFile string, outStream io.Writer) *Bump {
 	return &Bump{
 		version:     version,
 		versionType: versionType,
+		versionFile: versionFile,
 		outStream:   outStream,
 	}
 }
@@ -157,7 +174,7 @@ func (b *Bump) Up() error {
 }
 
 func (b *Bump) upFromFile() (*Version, error) {
-	file := NewVersionIO()
+	file := NewVersionIO(b.versionFile)
 
 	var err error
 	b.version, err = file.Read()
@@ -179,6 +196,6 @@ func (b *Bump) upFromCommandLine() (*Version, error) {
 		return nil, err
 	}
 
-	file := NewVersionIO()
+	file := NewVersionIO(b.versionFile)
 	return file.Write(b.version)
 }

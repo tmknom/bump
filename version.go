@@ -15,9 +15,9 @@ type VersionIO struct {
 }
 
 // NewVersionIO constructs a new VersionIO.
-func NewVersionIO() *VersionIO {
+func NewVersionIO(path string) *VersionIO {
 	return &VersionIO{
-		path: defaultVersionFile,
+		path: path,
 	}
 }
 
