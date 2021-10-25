@@ -31,12 +31,12 @@ func (f *VersionIO) Read() (*Version, error) {
 }
 
 // Write writes the version to the version file.
-func (f *VersionIO) Write(version *Version) (*Version, error) {
+func (f *VersionIO) Write(version *Version) (v *Version, err error) {
 	file, err := os.Create(f.path)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func(f *os.File) { err = f.Close() }(file)
 
 	_, err = file.WriteString(version.string() + "\n")
 	if err != nil {
