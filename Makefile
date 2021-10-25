@@ -41,6 +41,9 @@ install-tools: ## install tools for development
 	go install golang.org/x/tools/cmd/goimports@latest
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 
+.PHONY: check
+check: lint test ## check all
+
 .PHONY: test
 test: ## test
 	go test ./...
