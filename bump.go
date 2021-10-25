@@ -90,8 +90,8 @@ func (c *InitCommand) Run() error {
 		return err
 	}
 
-	fmt.Fprintln(c.outStream, v.string())
-	return nil
+	_, err = fmt.Fprintln(c.outStream, v.string())
+	return err
 }
 
 // ShowCommand is a command which show current version.
@@ -109,8 +109,8 @@ func (c *ShowCommand) Run() error {
 		return err
 	}
 
-	fmt.Fprintln(c.outStream, version.string())
-	return nil
+	_, err = fmt.Fprintln(c.outStream, version.string())
+	return err
 }
 
 // Bump wraps the basic bump up method.
