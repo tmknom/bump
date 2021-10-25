@@ -54,7 +54,7 @@ func TestHandleSubcommand(t *testing.T) {
 
 	for _, tc := range cases {
 		stdout := &bytes.Buffer{}
-		err := handleSubcommand(tc.subcommand, tc.args, stdout)
+		err := handleSubcommand(tc.subcommand, tc.args, stdout, os.Stderr)
 		if err != nil {
 			t.Fatalf("%q - unexpected error: %s", tc.args, err)
 		}
@@ -89,7 +89,7 @@ func TestHandleSubcommandWithVersion(t *testing.T) {
 
 	for _, tc := range cases {
 		stdout := &bytes.Buffer{}
-		err := handleSubcommand(tc.subcommand, tc.args, stdout)
+		err := handleSubcommand(tc.subcommand, tc.args, stdout, os.Stderr)
 		if err != nil {
 			t.Fatalf("'%q %q' - unexpected error: %s", tc.subcommand, tc.args[0], err)
 		}

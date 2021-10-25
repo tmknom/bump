@@ -18,39 +18,44 @@ func Handle(args []string, outStream, errStream io.Writer) error {
 		return printHelp(errStream)
 	}
 
-	return handleSubcommand(fs.Arg(0), args[1:], outStream)
+	return handleSubcommand(fs.Arg(0), args[1:], outStream, errStream)
 }
 
-func handleSubcommand(subcommand string, args []string, outStream io.Writer) error {
+func handleSubcommand(subcommand string, args []string, outStream, errStream io.Writer) error {
 	switch subcommand {
 	case "init":
 		cmd := &InitCommand{
 			args:      args,
 			outStream: outStream,
+			errStream: errStream,
 		}
 		return cmd.Run()
 	case "major":
 		cmd := &MajorCommand{
 			args:      args,
 			outStream: outStream,
+			errStream: errStream,
 		}
 		return cmd.Run()
 	case "minor":
 		cmd := &MinorCommand{
 			args:      args,
 			outStream: outStream,
+			errStream: errStream,
 		}
 		return cmd.Run()
 	case "patch":
 		cmd := &PatchCommand{
 			args:      args,
 			outStream: outStream,
+			errStream: errStream,
 		}
 		return cmd.Run()
 	case "show":
 		cmd := &ShowCommand{
 			args:      args,
 			outStream: outStream,
+			errStream: errStream,
 		}
 		return cmd.Run()
 	}
