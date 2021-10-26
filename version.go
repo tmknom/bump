@@ -45,15 +45,6 @@ func (f *VersionIO) Write(version *Version) (v *Version, err error) {
 	return version, nil
 }
 
-type VersionType int
-
-const (
-	_ VersionType = iota
-	MAJOR
-	MINOR
-	PATCH
-)
-
 // Version takes the form X.Y.Z: X is the major version, Y is the minor version, and Z is the patch version.
 type Version struct {
 	major
@@ -97,16 +88,16 @@ func (v *Version) string() string {
 	return fmt.Sprintf("%d.%d.%d", v.major, v.minor, v.patch)
 }
 
-func (v *Version) up(t VersionType) error {
-	switch t {
-	case MAJOR:
+func (v *Version) up(t *VersionType) error {
+	switch t.value {
+	case MajorVersionType:
 		v.upMajor()
-	case MINOR:
+	case MinorVersionType:
 		v.upMinor()
-	case PATCH:
+	case PatchVersionType:
 		v.upPatch()
 	default:
-		return fmt.Errorf("invalid VersionType: %d", t)
+		return fmt.Errorf("invalid VersionType: %q", t)
 	}
 	return nil
 }
@@ -125,3 +116,21 @@ func (v *Version) upMinor() {
 func (v *Version) upPatch() {
 	v.patch += 1
 }
+
+type VersionType struct {
+	value string
+}
+
+func (t *VersionType) subcommand() string {
+	return t.value
+}
+
+const (
+	MajorVersionType = "major"
+	MinorVersionType = "minor"
+	PatchVersionType = "patch"
+)
+
+var MAJOR = &VersionType{value: MajorVersionType}
+var MINOR = &VersionType{value: MinorVersionType}
+var PATCH = &VersionType{value: PatchVersionType}
