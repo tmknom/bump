@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestHandle(t *testing.T) {
+func TestRun(t *testing.T) {
 	cases := []struct {
 		args     []string
 		expected string
@@ -19,7 +19,7 @@ func TestHandle(t *testing.T) {
 
 	for _, tc := range cases {
 		stdout := &bytes.Buffer{}
-		err := Handle(tc.args, stdout, os.Stderr)
+		err := Run(tc.args, stdout, os.Stderr)
 		if err != nil {
 			t.Fatalf("%q - unexpected error: %s", tc.args, err)
 		}
@@ -40,7 +40,7 @@ func TestHandle(t *testing.T) {
 	}
 }
 
-func TestHandleSubcommand(t *testing.T) {
+func TestRunSubcommand(t *testing.T) {
 	cases := []struct {
 		subcommand string
 		args       []string
@@ -54,7 +54,7 @@ func TestHandleSubcommand(t *testing.T) {
 
 	for _, tc := range cases {
 		stdout := &bytes.Buffer{}
-		err := handleSubcommand(tc.subcommand, tc.args, stdout, os.Stderr)
+		err := runSubcommand(tc.subcommand, tc.args, stdout, os.Stderr)
 		if err != nil {
 			t.Fatalf("%q - unexpected error: %s", tc.args, err)
 		}
@@ -75,7 +75,7 @@ func TestHandleSubcommand(t *testing.T) {
 	}
 }
 
-func TestHandleSubcommandWithVersion(t *testing.T) {
+func TestRunSubcommandWithVersion(t *testing.T) {
 	cases := []struct {
 		subcommand string
 		args       []string
@@ -89,7 +89,7 @@ func TestHandleSubcommandWithVersion(t *testing.T) {
 
 	for _, tc := range cases {
 		stdout := &bytes.Buffer{}
-		err := handleSubcommand(tc.subcommand, tc.args, stdout, os.Stderr)
+		err := runSubcommand(tc.subcommand, tc.args, stdout, os.Stderr)
 		if err != nil {
 			t.Fatalf("'%q %q' - unexpected error: %s", tc.subcommand, tc.args[0], err)
 		}
