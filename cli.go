@@ -9,9 +9,14 @@ import (
 func Handle(args []string, outStream, errStream io.Writer) error {
 	fs := flag.NewFlagSet("bump", flag.ContinueOnError)
 	fs.SetOutput(errStream)
+	version := fs.Bool("version", false, "Show version")
 	err := fs.Parse(args)
 	if err != nil {
 		return err
+	}
+
+	if *version {
+		return printVersion(errStream)
 	}
 
 	if fs.NArg() == 0 {
@@ -68,4 +73,9 @@ func printHelp(out io.Writer) error {
 		return err
 	}
 	return flag.ErrHelp
+}
+
+func printVersion(out io.Writer) error {
+	_, err := fmt.Fprintf(out, "bump v%s\n", "0.0.1")
+	return err
 }
