@@ -138,6 +138,10 @@ func (c *ShowCommand) Run() error {
 	fs := flag.NewFlagSet("bump show", flag.ContinueOnError)
 	fs.SetOutput(c.errStream)
 	fs.StringVar(&c.versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
+
+	prefix := ""
+	fs.StringVar(&prefix, "prefix", prefix, "Show version with prefix")
+
 	err := fs.Parse(c.args)
 	if err != nil {
 		return err
@@ -150,7 +154,7 @@ func (c *ShowCommand) Run() error {
 		return err
 	}
 
-	_, err = fmt.Fprintln(c.outStream, version.string())
+	_, err = fmt.Fprintf(c.outStream, "%s%s\n", prefix, version.string())
 	return err
 }
 
