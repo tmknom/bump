@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-func Handle(args []string, outStream, errStream io.Writer) error {
+func Run(args []string, outStream, errStream io.Writer) error {
 	fs := flag.NewFlagSet("bump", flag.ContinueOnError)
 	fs.SetOutput(errStream)
 	version := fs.Bool("version", false, "Show version")
@@ -26,10 +26,10 @@ func Handle(args []string, outStream, errStream io.Writer) error {
 		return flag.ErrHelp
 	}
 
-	return handleSubcommand(fs.Arg(0), args[1:], outStream, errStream)
+	return runSubcommand(fs.Arg(0), args[1:], outStream, errStream)
 }
 
-func handleSubcommand(subcommand string, args []string, outStream, errStream io.Writer) error {
+func runSubcommand(subcommand string, args []string, outStream, errStream io.Writer) error {
 	switch subcommand {
 	case "init":
 		cmd := &InitCommand{
