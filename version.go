@@ -97,7 +97,7 @@ func (v *Version) up(t *VersionType) error {
 	case PatchVersionType:
 		v.upPatch()
 	default:
-		return fmt.Errorf("invalid VersionType: %q", t)
+		return fmt.Errorf("invalid versionType: %q", t)
 	}
 	return nil
 }
