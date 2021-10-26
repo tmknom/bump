@@ -16,7 +16,7 @@ type MajorCommand struct {
 
 // Run runs the procedure of this command.
 func (c *MajorCommand) Run() error {
-	return parseAndUp("major", c.args, c.outStream, c.errStream, MAJOR)
+	return parseAndUp(MAJOR, c.args, c.outStream, c.errStream)
 }
 
 // MinorCommand is a command which bump up minor version.
@@ -29,7 +29,7 @@ type MinorCommand struct {
 
 // Run runs the procedure of this command.
 func (c *MinorCommand) Run() error {
-	return parseAndUp("minor", c.args, c.outStream, c.errStream, MINOR)
+	return parseAndUp(MINOR, c.args, c.outStream, c.errStream)
 }
 
 // PatchCommand is a command which bump up patch version.
@@ -42,11 +42,11 @@ type PatchCommand struct {
 
 // Run runs the procedure of this command.
 func (c *PatchCommand) Run() error {
-	return parseAndUp("patch", c.args, c.outStream, c.errStream, PATCH)
+	return parseAndUp(PATCH, c.args, c.outStream, c.errStream)
 }
 
-func parseAndUp(subcommand string, args []string, outStream, errStream io.Writer, versionType VersionType) error {
-	fs := flag.NewFlagSet(fmt.Sprintf("bump %s", subcommand), flag.ContinueOnError)
+func parseAndUp(versionType *VersionType, args []string, outStream, errStream io.Writer) error {
+	fs := flag.NewFlagSet(fmt.Sprintf("bump %s", versionType.subcommand()), flag.ContinueOnError)
 	fs.SetOutput(errStream)
 
 	var versionFile string
@@ -141,13 +141,13 @@ func (c *ShowCommand) Run() error {
 // Bump wraps the basic bump up method.
 type Bump struct {
 	version     *Version
-	versionType VersionType
+	versionType *VersionType
 	versionFile string
 	outStream   io.Writer
 }
 
 // NewBump constructs a new Bump.
-func NewBump(version *Version, versionType VersionType, versionFile string, outStream io.Writer) *Bump {
+func NewBump(version *Version, versionType *VersionType, versionFile string, outStream io.Writer) *Bump {
 	return &Bump{
 		version:     version,
 		versionType: versionType,

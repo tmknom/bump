@@ -7,7 +7,7 @@ import (
 func TestVersionUp(t *testing.T) {
 	cases := []struct {
 		version     *Version
-		versionType VersionType
+		versionType *VersionType
 		expected    string
 	}{
 		{newVersion(major(0), minor(0), patch(0)), PATCH, "0.0.1"},
