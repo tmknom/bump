@@ -8,51 +8,67 @@ import (
 
 // MajorCommand is a command which bump up major version.
 type MajorCommand struct {
-	versionFile string
-	args        []string
-	outStream   io.Writer
-	errStream   io.Writer
+	*baseBumpCommand
 }
 
-// Run runs the procedure of this command.
-func (c *MajorCommand) Run() error {
-	return parseAndUp(MAJOR, c.args, c.outStream, c.errStream)
+func newMajorCommand(args []string, outStream, errStream io.Writer) *MajorCommand {
+	return &MajorCommand{
+		baseBumpCommand: &baseBumpCommand{
+			versionType: MAJOR,
+			args:        args,
+			outStream:   outStream,
+			errStream:   errStream,
+		},
+	}
 }
 
 // MinorCommand is a command which bump up minor version.
 type MinorCommand struct {
-	versionFile string
-	args        []string
-	outStream   io.Writer
-	errStream   io.Writer
+	*baseBumpCommand
 }
 
-// Run runs the procedure of this command.
-func (c *MinorCommand) Run() error {
-	return parseAndUp(MINOR, c.args, c.outStream, c.errStream)
+func newMinorCommand(args []string, outStream, errStream io.Writer) *MinorCommand {
+	return &MinorCommand{
+		baseBumpCommand: &baseBumpCommand{
+			versionType: MINOR,
+			args:        args,
+			outStream:   outStream,
+			errStream:   errStream,
+		},
+	}
 }
 
 // PatchCommand is a command which bump up patch version.
 type PatchCommand struct {
-	versionFile string
+	*baseBumpCommand
+}
+
+func newPatchCommand(args []string, outStream, errStream io.Writer) *PatchCommand {
+	return &PatchCommand{
+		baseBumpCommand: &baseBumpCommand{
+			versionType: PATCH,
+			args:        args,
+			outStream:   outStream,
+			errStream:   errStream,
+		},
+	}
+}
+
+type baseBumpCommand struct {
+	versionType *VersionType
 	args        []string
 	outStream   io.Writer
 	errStream   io.Writer
 }
 
-// Run runs the procedure of this command.
-func (c *PatchCommand) Run() error {
-	return parseAndUp(PATCH, c.args, c.outStream, c.errStream)
-}
-
-func parseAndUp(versionType *VersionType, args []string, outStream, errStream io.Writer) error {
-	fs := flag.NewFlagSet(fmt.Sprintf("bump %s", versionType.subcommand()), flag.ContinueOnError)
-	fs.SetOutput(errStream)
+func (c *baseBumpCommand) run() error {
+	fs := flag.NewFlagSet(fmt.Sprintf("bump %s", c.versionType.subcommand()), flag.ContinueOnError)
+	fs.SetOutput(c.errStream)
 
 	var versionFile string
 	fs.StringVar(&versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
 
-	err := fs.Parse(args)
+	err := fs.Parse(c.args)
 	if err != nil {
 		return err
 	}
@@ -65,7 +81,7 @@ func parseAndUp(versionType *VersionType, args []string, outStream, errStream io
 		}
 	}
 
-	bump := NewBump(version, versionType, versionFile, outStream)
+	bump := NewBump(version, c.versionType, versionFile, c.outStream)
 	return bump.Up()
 }
 

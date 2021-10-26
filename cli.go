@@ -39,26 +39,14 @@ func handleSubcommand(subcommand string, args []string, outStream, errStream io.
 		}
 		return cmd.Run()
 	case "major":
-		cmd := &MajorCommand{
-			args:      args,
-			outStream: outStream,
-			errStream: errStream,
-		}
-		return cmd.Run()
+		cmd := newMajorCommand(args, outStream, errStream)
+		return cmd.run()
 	case "minor":
-		cmd := &MinorCommand{
-			args:      args,
-			outStream: outStream,
-			errStream: errStream,
-		}
-		return cmd.Run()
+		cmd := newMinorCommand(args, outStream, errStream)
+		return cmd.run()
 	case "patch":
-		cmd := &PatchCommand{
-			args:      args,
-			outStream: outStream,
-			errStream: errStream,
-		}
-		return cmd.Run()
+		cmd := newPatchCommand(args, outStream, errStream)
+		return cmd.run()
 	case "show":
 		cmd := &ShowCommand{
 			args:      args,
@@ -71,7 +59,7 @@ func handleSubcommand(subcommand string, args []string, outStream, errStream io.
 }
 
 func printTopLevelUsage(out io.Writer) {
-	message := fmt.Sprintf(`Bump version that following semantic versioning
+	message := `Bump version that following semantic versioning
 
 Usage:
   bump <command> [<version>] [flags]
@@ -91,7 +79,7 @@ Examples:
   $ bump init
   $ bump patch
   $ bump minor 1.0.0
-`)
+`
 	printUsage(out, message)
 }
 
