@@ -68,6 +68,9 @@ func (c *baseBumpCommand) run() error {
 	var versionFile string
 	fs.StringVar(&versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
 
+	var dryRun bool
+	fs.BoolVar(&dryRun, "dry-run", false, "Dry run bump up")
+
 	err := fs.Parse(c.args)
 	if err != nil {
 		return err
@@ -81,7 +84,7 @@ func (c *baseBumpCommand) run() error {
 		}
 	}
 
-	bump := NewBump(version, c.versionType, versionFile, c.outStream)
+	bump := NewBump(version, c.versionType, versionFile, dryRun, c.outStream)
 	return bump.Up()
 }
 
@@ -163,15 +166,17 @@ type Bump struct {
 	version     *Version
 	versionType *VersionType
 	versionFile string
+	dryRun      bool
 	outStream   io.Writer
 }
 
 // NewBump constructs a new Bump.
-func NewBump(version *Version, versionType *VersionType, versionFile string, outStream io.Writer) *Bump {
+func NewBump(version *Version, versionType *VersionType, versionFile string, dryRun bool, outStream io.Writer) *Bump {
 	return &Bump{
 		version:     version,
 		versionType: versionType,
 		versionFile: versionFile,
+		dryRun:      dryRun,
 		outStream:   outStream,
 	}
 }
@@ -207,8 +212,7 @@ func (b *Bump) upFromFile() (*Version, error) {
 		return nil, err
 	}
 
-	writer := NewVersionWriter(FileWriteType, b.version, b.versionFile)
-	return writer.Write()
+	return b.write()
 }
 
 func (b *Bump) upFromCommandLine() (*Version, error) {
@@ -217,6 +221,15 @@ func (b *Bump) upFromCommandLine() (*Version, error) {
 		return nil, err
 	}
 
-	writer := NewVersionWriter(FileWriteType, b.version, b.versionFile)
+	return b.write()
+}
+
+func (b *Bump) write() (*Version, error) {
+	writeType := FileWriteType
+	if b.dryRun {
+		writeType = NullWriteType
+	}
+
+	writer := NewVersionWriter(writeType, b.version, b.versionFile)
 	return writer.Write()
 }
