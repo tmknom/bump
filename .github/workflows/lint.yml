@@ -1,0 +1,35 @@
+name: Lint for Go codes
+on:
+  push:
+    branches:
+      - release-*
+      - run-lint-workflow
+  pull_request:
+    paths:
+      - '**.go'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.2
+      - name: Install dependencies
+        run: make install-tools
+      - name: Static analysis by staticcheck
+        run: make staticcheck
+      - name: Static analysis by vet
+        run: make vet
+      - name: Check format by goimports
+        run: |
+          make goimports
+          test -z "$(git status -s | tee /dev/stderr)"
