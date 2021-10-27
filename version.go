@@ -30,19 +30,36 @@ func (f *VersionIO) Read() (*Version, error) {
 	return toVersion(string(bytes))
 }
 
-// Write writes the version to the version file.
-func (f *VersionIO) Write(version *Version) (v *Version, err error) {
-	file, err := os.Create(f.path)
-	if err != nil {
-		return nil, err
-	}
-	defer func(f *os.File) { err = f.Close() }(file)
+// VersionWriter wraps the write method for storing version.
+type VersionWriter struct {
+	writeType WriteType
+	version   *Version
+	path      string
+}
 
-	_, err = file.WriteString(version.string() + "\n")
-	if err != nil {
-		return nil, err
+// NewVersionWriter constructs a new VersionWriter.
+func NewVersionWriter(writeType WriteType, version *Version, path string) *VersionWriter {
+	return &VersionWriter{
+		writeType: writeType,
+		version:   version,
+		path:      path,
 	}
-	return version, nil
+}
+
+type WriteType int
+
+const (
+	_ WriteType = iota
+	NullWriteType
+	FileWriteType
+)
+
+// Write writes the version to the version file.
+func (w *VersionWriter) Write() (*Version, error) {
+	if w.writeType == NullWriteType {
+		return w.version, nil
+	}
+	return w.version, os.WriteFile(w.path, []byte(w.version.string()+"\n"), 0644)
 }
 
 // Version takes the form X.Y.Z: X is the major version, Y is the minor version, and Z is the patch version.
