@@ -115,8 +115,8 @@ func (c *InitCommand) Run() error {
 		return err
 	}
 
-	file := NewVersionIO(c.versionFile)
-	version, err = file.Write(version)
+	writer := NewVersionWriter(FileWriteType, version, c.versionFile)
+	version, err = writer.Write()
 	if err != nil {
 		return err
 	}
@@ -207,7 +207,8 @@ func (b *Bump) upFromFile() (*Version, error) {
 		return nil, err
 	}
 
-	return file.Write(b.version)
+	writer := NewVersionWriter(FileWriteType, b.version, b.versionFile)
+	return writer.Write()
 }
 
 func (b *Bump) upFromCommandLine() (*Version, error) {
@@ -216,6 +217,6 @@ func (b *Bump) upFromCommandLine() (*Version, error) {
 		return nil, err
 	}
 
-	file := NewVersionIO(b.versionFile)
-	return file.Write(b.version)
+	writer := NewVersionWriter(FileWriteType, b.version, b.versionFile)
+	return writer.Write()
 }
