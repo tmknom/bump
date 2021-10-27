@@ -1,0 +1,27 @@
+name: Test for Go programs
+on:
+  push:
+    branches:
+      - release-*
+      - run-test-workflow
+  pull_request:
+    paths:
+      - '**.go'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.2
+      - name: Test
+        run: go test ./...
