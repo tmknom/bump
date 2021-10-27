@@ -1,0 +1,31 @@
+name: Check for commit messages
+on:
+  push:
+    branches:
+      - release-*
+      - run-commitlint-workflow
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 50
+      - name: Install commitlint
+        run: sudo npm install -g @commitlint/{cli,config-conventional}
+      - name: Display commitlint
+        run: commitlint --version
+      - name: Fetch base branch
+        run: git fetch --no-tags --depth=1 origin main
+      - name: Run commitlint
+        run: |
+          base_sha=$(git merge-base origin/main HEAD)
+          commitlint --from "${base_sha}" --to ${{ github.sha }} --verbose
