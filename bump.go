@@ -35,18 +35,20 @@ func newPatchCommand(args []string, outStream, errStream io.Writer) *PatchComman
 }
 
 type baseBumpCommand struct {
-	versionType *VersionType
-	args        []string
-	outStream   io.Writer
-	errStream   io.Writer
+	*Config
+	args      []string
+	outStream io.Writer
+	errStream io.Writer
 }
 
 func newBaseBumpCommand(versionType *VersionType, args []string, outStream, errStream io.Writer) *baseBumpCommand {
 	return &baseBumpCommand{
-		versionType: versionType,
-		args:        args,
-		outStream:   outStream,
-		errStream:   errStream,
+		Config: &Config{
+			versionType: versionType,
+		},
+		args:      args,
+		outStream: outStream,
+		errStream: errStream,
 	}
 }
 
@@ -63,28 +65,33 @@ func (c *baseBumpCommand) run() error {
 	}
 
 	fs := flag.NewFlagSet(fmt.Sprintf("bump %s [<version>]", c.versionType.subcommand()), flag.ContinueOnError)
-	var versionFile string
-	fs.StringVar(&versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
-
-	var dryRun bool
-	fs.BoolVar(&dryRun, "dry-run", false, "Dry run bump up")
+	fs.StringVar(&c.versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
+	fs.BoolVar(&c.dryRun, "dry-run", false, "Dry run bump up")
 	fs.SetOutput(c.errStream)
-
 	err = fs.Parse(c.args)
 	if err != nil {
 		return err
 	}
 
-	bump := NewBump(version, c.versionType, versionFile, dryRun, c.outStream)
+	bump := NewBump(version, c.Config, c.outStream)
 	return bump.Up()
 }
 
 // InitCommand is a command which inits a new version file.
 type InitCommand struct {
-	versionFile string
-	args        []string
-	outStream   io.Writer
-	errStream   io.Writer
+	*Config
+	args      []string
+	outStream io.Writer
+	errStream io.Writer
+}
+
+func newInitCommand(args []string, outStream, errStream io.Writer) *InitCommand {
+	return &InitCommand{
+		Config:    &Config{},
+		args:      args,
+		outStream: outStream,
+		errStream: errStream,
+	}
 }
 
 const defaultInitialVersion = "0.1.0"
@@ -121,10 +128,19 @@ func (c *InitCommand) Run() error {
 
 // ShowCommand is a command which show current version.
 type ShowCommand struct {
-	versionFile string
-	args        []string
-	outStream   io.Writer
-	errStream   io.Writer
+	*Config
+	args      []string
+	outStream io.Writer
+	errStream io.Writer
+}
+
+func newShowCommand(args []string, outStream, errStream io.Writer) *ShowCommand {
+	return &ShowCommand{
+		Config:    &Config{},
+		args:      args,
+		outStream: outStream,
+		errStream: errStream,
+	}
 }
 
 // Run runs the procedure of this command.
@@ -132,10 +148,7 @@ func (c *ShowCommand) Run() error {
 	fs := flag.NewFlagSet("bump show", flag.ContinueOnError)
 	fs.SetOutput(c.errStream)
 	fs.StringVar(&c.versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
-
-	prefix := ""
-	fs.StringVar(&prefix, "prefix", prefix, "Show version with prefix")
-
+	fs.StringVar(&c.prefix, "prefix", "", "Show version with prefix")
 	err := fs.Parse(c.args)
 	if err != nil {
 		return err
@@ -148,27 +161,31 @@ func (c *ShowCommand) Run() error {
 		return err
 	}
 
-	_, err = fmt.Fprintf(c.outStream, "%s%s\n", prefix, version.string())
+	_, err = fmt.Fprintf(c.outStream, "%s%s\n", c.prefix, version.string())
 	return err
+}
+
+// Config is a config for top-level CLI settings.
+type Config struct {
+	versionType *VersionType
+	versionFile string
+	prefix      string
+	dryRun      bool
 }
 
 // Bump wraps the basic bump up method.
 type Bump struct {
-	version     *Version
-	versionType *VersionType
-	versionFile string
-	dryRun      bool
-	outStream   io.Writer
+	*Config
+	version   *Version
+	outStream io.Writer
 }
 
 // NewBump constructs a new Bump.
-func NewBump(version *Version, versionType *VersionType, versionFile string, dryRun bool, outStream io.Writer) *Bump {
+func NewBump(version *Version, config *Config, outStream io.Writer) *Bump {
 	return &Bump{
-		version:     version,
-		versionType: versionType,
-		versionFile: versionFile,
-		dryRun:      dryRun,
-		outStream:   outStream,
+		version:   version,
+		Config:    config,
+		outStream: outStream,
 	}
 }
 

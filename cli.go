@@ -32,11 +32,7 @@ func Run(args []string, outStream, errStream io.Writer) error {
 func runSubcommand(subcommand string, args []string, outStream, errStream io.Writer) error {
 	switch subcommand {
 	case "init":
-		cmd := &InitCommand{
-			args:      args,
-			outStream: outStream,
-			errStream: errStream,
-		}
+		cmd := newInitCommand(args, outStream, errStream)
 		return cmd.Run()
 	case "major":
 		cmd := newMajorCommand(args, outStream, errStream)
@@ -48,11 +44,7 @@ func runSubcommand(subcommand string, args []string, outStream, errStream io.Wri
 		cmd := newPatchCommand(args, outStream, errStream)
 		return cmd.run()
 	case "show":
-		cmd := &ShowCommand{
-			args:      args,
-			outStream: outStream,
-			errStream: errStream,
-		}
+		cmd := newShowCommand(args, outStream, errStream)
 		return cmd.Run()
 	}
 	return nil
