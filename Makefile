@@ -18,6 +18,12 @@ MAKEFLAGS += --no-builtin-variables
 .DEFAULT_GOAL := help
 
 #
+# Variables to be used by docker commands
+#
+DOCKER ?= $(shell which docker)
+DOCKER_RUN ?= $(DOCKER) run -i --rm -v $(CURDIR):/work -w /work
+
+#
 # Build and run
 #
 .PHONY: build
@@ -68,6 +74,13 @@ goimports: ## update import lines
 clean: ## clean files
 	rm -rf ./bin
 	rm -rf ./VERSION
+
+#
+# Docs
+#
+.PHONY: format-markdown
+format-markdown: ## format markdown by prettier
+	$(DOCKER_RUN) prettier --write --parser=markdown **/*.md
 
 #
 # Help
