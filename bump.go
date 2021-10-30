@@ -56,7 +56,7 @@ func (c *baseBumpCommand) run() error {
 	var version *Version
 	var err error
 
-	if len(c.args) > 0 && !strings.HasPrefix(c.args[0], "-") {
+	if parseVersionFromArgs(c.args) {
 		version, err = toVersion(c.args[0])
 		if err != nil {
 			return err
@@ -98,20 +98,20 @@ const defaultInitialVersion = "0.1.0"
 
 // Run runs the procedure of this command.
 func (c *InitCommand) Run() error {
-	fs := flag.NewFlagSet("bump init", flag.ContinueOnError)
-	fs.SetOutput(c.errStream)
-	fs.StringVar(&c.versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
-	err := fs.Parse(c.args)
+	strVersion := defaultInitialVersion
+	if parseVersionFromArgs(c.args) {
+		strVersion = c.args[0]
+		c.args = c.args[1:]
+	}
+	version, err := toVersion(strVersion)
 	if err != nil {
 		return err
 	}
 
-	strVersion := defaultInitialVersion
-	if fs.NArg() > 0 {
-		strVersion = fs.Arg(0)
-	}
-
-	version, err := toVersion(strVersion)
+	fs := flag.NewFlagSet("bump init", flag.ContinueOnError)
+	fs.SetOutput(c.errStream)
+	fs.StringVar(&c.versionFile, "version-file", defaultVersionFile, "A version file for storing current version")
+	err = fs.Parse(c.args)
 	if err != nil {
 		return err
 	}
@@ -163,6 +163,10 @@ func (c *ShowCommand) Run() error {
 
 	_, err = fmt.Fprintf(c.outStream, "%s%s\n", c.prefix, version.string())
 	return err
+}
+
+func parseVersionFromArgs(args []string) bool {
+	return len(args) > 0 && !strings.HasPrefix(args[0], "-")
 }
 
 // Config is a config for top-level CLI settings.
