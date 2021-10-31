@@ -1,6 +1,9 @@
 # Output of the executable binaries
 bin/
 
+# Artifacts of the goreleaser created
+dist/
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
