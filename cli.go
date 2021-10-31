@@ -46,8 +46,9 @@ func runSubcommand(subcommand string, args []string, outStream, errStream io.Wri
 	case "show":
 		cmd := newShowCommand(args, outStream, errStream)
 		return cmd.Run()
+	default:
+		return fmt.Errorf("unknown command \"%s\" for \"bump\": `bump -h` for more details", subcommand)
 	}
-	return nil
 }
 
 func printTopLevelUsage(out io.Writer) {
