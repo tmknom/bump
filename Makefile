@@ -18,8 +18,9 @@ MAKEFLAGS += --no-builtin-variables
 .DEFAULT_GOAL := help
 
 #
-# Variables to be used by docker commands
+# Variables to be used by commands
 #
+GIT ?= $(shell which git)
 DOCKER ?= $(shell which docker)
 DOCKER_RUN ?= $(DOCKER) run -i --rm -v $(CURDIR):/work -w /work
 
@@ -81,6 +82,50 @@ clean: ## clean files
 .PHONY: format-markdown
 format-markdown: ## format markdown by prettier
 	$(DOCKER_RUN) prettier --write --parser=markdown **/*.md
+
+#
+# Release
+#
+.PHONY: release-major
+release-major: ## release major version
+	$(call release,major)
+
+.PHONY: release-minor
+release-minor: ## release minor version
+	$(call release,minor)
+
+.PHONY: release-patch
+release-patch: ## release patch version
+	$(call release,patch)
+
+.PHONY: release-initial
+release-initial: ## release initial version
+	$(call release,init)
+
+define release
+	$(BUMP) $(1)
+	$(MAKE) generate-changelog
+	$(MAKE) git-push
+endef
+
+.PHONY: generate-changelog
+generate-changelog:
+	$(STANDARD_VERSION) --release-as "$(CURRENT_VERSION)"
+	$(MAKE) format-markdown
+
+.PHONY: git-push
+git-push:
+	$(GIT) switch -c "$(RELEASE_BRANCH)"
+	$(GIT) add CHANGELOG.md VERSION
+	$(GIT) commit -m "chore: release $(CURRENT_VERSION)"
+	$(GIT) tag -a $(RELEASE_TAG) -m "release $(CURRENT_VERSION)"
+	$(GIT) push origin "$(RELEASE_BRANCH)" "$(RELEASE_TAG)"
+
+BUMP ?= $(shell which bump)
+STANDARD_VERSION ?= $(DOCKER_RUN) standard-version --skip.commit --skip.tag
+CURRENT_VERSION ?= $(shell $(BUMP) show)
+RELEASE_BRANCH ?= release-$(CURRENT_VERSION)
+RELEASE_TAG ?= v$(CURRENT_VERSION)
 
 #
 # Help
