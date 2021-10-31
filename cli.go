@@ -83,6 +83,6 @@ func printUsage(out io.Writer, message string) {
 }
 
 func printVersion(out io.Writer) error {
-	_, err := fmt.Fprintf(out, "bump v%s\n", "0.0.1")
+	_, err := fmt.Fprintf(out, "bump v%s\n", "0.1.0")
 	return err
 }
