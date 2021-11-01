@@ -128,6 +128,16 @@ RELEASE_BRANCH ?= release-$(CURRENT_VERSION)
 RELEASE_TAG ?= v$(CURRENT_VERSION)
 
 #
+# CI
+#
+.PHONY: publish-release-notes
+publish-release-notes: ## publish release notes
+	grep -A 100000 -E '## .+[0-9]' CHANGELOG.md | sed '1d' | sed '1d' > $${TMPDIR}/tmp.md
+	grep -m1 -B 100000 -E '## .+[0-9]' $${TMPDIR}/tmp.md | sed '$$d' | sed '$$d' > $${TMPDIR}/release.md \
+	  || cp $${TMPDIR}/tmp.md $${TMPDIR}/release.md
+	gh release create $(RELEASE_TAG) -F $${TMPDIR}/release.md
+
+#
 # Help
 #
 .PHONY: help
