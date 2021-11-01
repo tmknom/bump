@@ -123,7 +123,7 @@ git-push:
 
 BUMP ?= $(shell which bump)
 STANDARD_VERSION ?= $(DOCKER_RUN) standard-version --skip.commit --skip.tag
-CURRENT_VERSION ?= $(shell $(BUMP) show)
+CURRENT_VERSION ?= $(shell cat VERSION)
 RELEASE_BRANCH ?= release-$(CURRENT_VERSION)
 RELEASE_TAG ?= v$(CURRENT_VERSION)
 
